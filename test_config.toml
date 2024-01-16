@@ -1,7 +1,9 @@
-[chat_configs]
+host = "0.0.0.0"
+port = 8080
+
+chat_configs = []
 # 聊天模型配置列表
 
-[whisper_configs]
 # 语音转文字模型配置列表
 # #[derive(Clone, Debug, Deserialize)]
 #pub(crate) struct WhisperModelConfig {
@@ -14,4 +16,7 @@
 #    #[serde(default = "default_quantized")]
 #    pub(crate) quantized: bool,
 #}
+[[whisper_configs]]
+model_id = "whisper"
+alias = "whisper"
 

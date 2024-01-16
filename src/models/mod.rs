@@ -2,7 +2,9 @@ use crate::configs::Config;
 use crate::models::audio::whisper::Whisper;
 use crate::types::RequestTypes;
 use llama_cpp_rs::LLama;
+use silent::prelude::{error, info};
 use std::collections::HashMap;
+use tokio::signal;
 use tokio::sync::mpsc::Receiver;
 
 pub(crate) mod audio;
@@ -40,19 +42,47 @@ impl Models {
     }
 
     pub async fn handle(&mut self) -> anyhow::Result<()> {
-        while let Some(types) = self.receiver.recv().await {
-            match types {
-                RequestTypes::Whisper(request, sender) => {
-                    let model = self.get_whisper(request.model.get_model_string());
-                    if let Some(model) = model {
-                        let res = model.handle(request, None)?;
-                        sender.send(res.into()).expect("failed to send response");
+        loop {
+            #[cfg(unix)]
+            let terminate = async {
+                signal::unix::signal(signal::unix::SignalKind::terminate())
+                    .expect("failed to install signal handler")
+                    .recv()
+                    .await;
+            };
+
+            #[cfg(not(unix))]
+            let terminate = async {
+                let _ = std::future::pending::<()>().await;
+            };
+            tokio::select! {
+                    _ = signal::ctrl_c() => {
+                        info!("received ctrl-c");
+                        break Ok(());
                     }
+                    _ = terminate => {
+                        info!("received terminate");
+                        break Ok(());
+                    }
+                    Some(types) = self.receiver.recv() => {
+                info!("received request");
+                match types {
+                    RequestTypes::Whisper(request, sender) => {
+                        let model = self.get_whisper(request.model.get_model_string());
+                        if let Some(model) = model {
+                            info!("model found");
+                            let res = model.handle(request, None)?;
+                            info!("response created");
+                            match sender.send(res.into()) {
+                                Ok(_) => info!("response sent"),
+                                Err(e) => error!("error sending response: {:?}", e),
+                            }
+                        }
+                    }
+                    RequestTypes::Chat => {}
                 }
-                RequestTypes::Chat => {}
-            }
+            }}
         }
-        Ok(())
     }
 }
 

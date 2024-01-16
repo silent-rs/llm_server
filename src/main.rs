@@ -20,11 +20,12 @@ async fn main() {
     let mut models = Models::new(llm_config, rx).expect("failed to initialize models");
     configs.insert(tx);
     let route = Route::new("").append(get_routes());
-    tokio::select! {
-        _ = models.handle() => {},
-    _ = Server::new()
-        .with_configs(configs)
-        .bind(format!("{host}:{port}").parse().unwrap())
-        .serve(route)=>{},
-    }
+    tokio::spawn(async move {
+        Server::new()
+            .with_configs(configs)
+            .bind(format!("{host}:{port}").parse().unwrap())
+            .serve(route)
+            .await
+    });
+    models.handle().await.expect("failed to handle requests");
 }
