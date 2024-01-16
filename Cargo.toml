@@ -5,5 +5,39 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+default = []
+metal = ["candle-core/metal", "candle-nn/metal", "llama_cpp_rs/metal"]
+cuda = ["candle-core/cuda", "candle-nn/cuda", "candle-transformers/cuda", "llama_cpp_rs/cuda", "dep:bindgen_cuda"]
+
+
+[build-dependencies]
+anyhow = { version = "1", features = ["backtrace"] }
+bindgen_cuda = { version = "0.1.1", optional = true }
+
 [dependencies]
 silent = "1.0.7"
+
+# base
+anyhow = "1.0.79"
+clap = { version = "4.2.4", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1.35.1", features = ["full"] }
+
+
+# whisper
+#candle-core = { version = "0.3.2" }
+#candle-nn = { version = "0.3.2" }
+#candle-transformers = { version = "0.3.2" }
+candle-core = { git = "https://github.com/huggingface/candle" }
+candle-nn = { git = "https://github.com/huggingface/candle" }
+candle-transformers = { git = "https://github.com/huggingface/candle" }
+byteorder = "1.5.0"
+tokenizers = { version = "0.15.0", features = ["onig"] }
+rand = "0.8.5"
+serde_json = "1.0.109"
+symphonia = { version = "0.5.3", features = ["all"] }
+
+# chat
+llama_cpp_rs = "0.3.0"
+toml = "0.8.8"
