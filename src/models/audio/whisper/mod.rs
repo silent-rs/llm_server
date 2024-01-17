@@ -37,7 +37,7 @@ impl Whisper {
     ) -> Result<CreateTranscriptionResponse> {
         let input = request.file.path().clone();
 
-        let pcm_data = pcm_decode(input);
+        let pcm_data = pcm_decode(input)?;
         let config = self.config.clone();
         let mel_filters = self.mel_filters.clone();
         let mel = audio::pcm_to_mel(&config, &pcm_data, &mel_filters);
