@@ -3,7 +3,6 @@ use crate::types::{RequestTypes, ResponseTypes};
 use silent::prelude::info;
 use silent::{Request, Response, Result, SilentError, StatusCode};
 use tokio::sync::mpsc::Sender;
-use tokio::sync::oneshot::error::RecvError;
 
 pub(crate) async fn create_transcription(mut req: Request) -> Result<Response> {
     let sender = req.configs().get::<Sender<RequestTypes>>().unwrap().clone();

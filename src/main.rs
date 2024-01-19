@@ -1,6 +1,7 @@
 use clap::Parser;
 use llm_server::types::RequestTypes;
 use llm_server::{get_routes, Args, Config as LlmConfig, Models};
+use silent::middlewares::{Cors, CorsType};
 use silent::prelude::{logger, Level, Route, Server};
 use silent::Configs;
 use tokio::sync::mpsc::channel;
@@ -16,10 +17,16 @@ async fn main() {
         .host
         .clone()
         .unwrap_or(args.host.clone().unwrap_or_else(|| "localhost".to_string()));
-    let port = llm_config.port.clone().unwrap_or(args.port.unwrap_or(8000));
+    let port = llm_config.port.unwrap_or(args.port.unwrap_or(8000));
     let mut models = Models::new(llm_config, rx).expect("failed to initialize models");
     configs.insert(tx);
-    let route = Route::new("").append(get_routes());
+    let route = Route::new("").append(get_routes()).hook(
+        Cors::new()
+            .origin(CorsType::Any)
+            .methods(CorsType::Any)
+            .headers(CorsType::Any)
+            .credentials(false),
+    );
     tokio::spawn(async move {
         Server::new()
             .with_configs(configs)
