@@ -2566,9 +2566,9 @@ dependencies = [
 
 [[package]]
 name = "silent"
-version = "1.0.7"
+version = "1.0.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "645392b283c8f103027c36dc343e9e0c94c365f5758251c90715d057719a6218"
+checksum = "a5c0c90a9f07b1a71fe5ef61db01c3aa802ab74f09c761538c88537a258baad4"
 dependencies = [
  "aes",
  "aes-gcm",
