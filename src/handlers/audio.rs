@@ -1,7 +1,9 @@
+use crate::models::Model;
 use crate::types::audio::transcription::CreateTranscriptionRequest;
 use crate::types::{RequestTypes, ResponseTypes};
 use silent::prelude::info;
 use silent::{Request, Response, Result, SilentError, StatusCode};
+use std::sync::Arc;
 use tokio::sync::mpsc::Sender;
 
 pub(crate) async fn create_transcription(mut req: Request) -> Result<Response> {
@@ -12,7 +14,7 @@ pub(crate) async fn create_transcription(mut req: Request) -> Result<Response> {
             format!("failed to parse request: {}", e),
         )
     })?;
-    let (tx, rx) = tokio::sync::oneshot::channel::<ResponseTypes>();
+    let (tx, mut rx) = tokio::sync::mpsc::channel::<ResponseTypes>(20);
     sender.send((req, tx).into()).await.map_err(|e| {
         SilentError::business_error(
             StatusCode::INTERNAL_SERVER_ERROR,
@@ -20,15 +22,15 @@ pub(crate) async fn create_transcription(mut req: Request) -> Result<Response> {
         )
     })?;
     info!("sent request");
-    match rx.await {
-        Ok(ResponseTypes::Whisper(res)) => Ok(res.into()),
-        Err(e) => {
-            info!("error receiving response: {:?}", e);
-            Err(SilentError::business_error(
-                StatusCode::INTERNAL_SERVER_ERROR,
-                format!("failed to create transcription: {e}"),
-            ))
-        }
+    match rx.recv().await {
+        Some(ResponseTypes::Whisper(res)) => Ok(res.into()),
+        // Err(e) => {
+        //     info!("error receiving response: {:?}", e);
+        //     Err(SilentError::business_error(
+        //         StatusCode::INTERNAL_SERVER_ERROR,
+        //         format!("failed to create transcription: {e}"),
+        //     ))
+        // }
         _ => Err(SilentError::business_error(
             StatusCode::INTERNAL_SERVER_ERROR,
             "failed to create transcription".to_string(),

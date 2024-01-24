@@ -1,5 +1,5 @@
-use crate::models::audio::whisper::device::token_id;
 use crate::models::audio::whisper::model::Model;
+use crate::models::device::token_id;
 use anyhow::Error as E;
 use candle_core::{self as candle, Device, IndexOp, Tensor};
 use candle_nn::ops::softmax;

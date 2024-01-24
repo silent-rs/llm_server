@@ -1,13 +1,14 @@
 use crate::types::audio::transcription::{CreateTranscriptionRequest, CreateTranscriptionResponse};
-use tokio::sync::oneshot::Sender;
+use crate::types::chat::completion::{ChatCompletionRequest, ChatCompletionResponse};
+use tokio::sync::mpsc::Sender;
 
 pub(crate) mod audio;
-mod chat;
+pub(crate) mod chat;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum RequestTypes {
     Whisper(CreateTranscriptionRequest, Sender<ResponseTypes>),
-    Chat,
+    Chat(ChatCompletionRequest, Sender<ResponseTypes>),
 }
 
 impl From<(CreateTranscriptionRequest, Sender<ResponseTypes>)> for RequestTypes {
@@ -16,14 +17,26 @@ impl From<(CreateTranscriptionRequest, Sender<ResponseTypes>)> for RequestTypes 
     }
 }
 
+impl From<(ChatCompletionRequest, Sender<ResponseTypes>)> for RequestTypes {
+    fn from(value: (ChatCompletionRequest, Sender<ResponseTypes>)) -> Self {
+        Self::Chat(value.0, value.1)
+    }
+}
+
 #[derive(Debug, Clone)]
 pub enum ResponseTypes {
     Whisper(CreateTranscriptionResponse),
-    Chat,
+    Chat(ChatCompletionResponse),
 }
 
 impl From<CreateTranscriptionResponse> for ResponseTypes {
     fn from(response: CreateTranscriptionResponse) -> Self {
         Self::Whisper(response)
+    }
+}
+
+impl From<ChatCompletionResponse> for ResponseTypes {
+    fn from(response: ChatCompletionResponse) -> Self {
+        Self::Chat(response)
     }
 }
