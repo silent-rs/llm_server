@@ -31,14 +31,8 @@ impl ChatModel {
             max_tokens,
             ..
         } = request;
-        let temperature = match temperature {
-            None => None,
-            Some(temperature) => Some(temperature as f64),
-        };
-        let top_p = match top_p {
-            None => None,
-            Some(top_p) => Some(top_p as f64),
-        };
+        let temperature = temperature.map(|temperature| temperature as f64);
+        let top_p = top_p.map(|top_p| top_p as f64);
         let prompt = self.chat_format.format_messages(messages)?;
         println!("prompt: {}", prompt);
         let tokens = self
@@ -47,8 +41,7 @@ impl ChatModel {
             .map_err(anyhow::Error::msg)?;
         let mut model = self.model.clone();
 
-        let mut logits_processor =
-            LogitsProcessor::new(self.seed, temperature.into(), top_p.into());
+        let mut logits_processor = LogitsProcessor::new(self.seed, temperature, top_p);
         let start_prompt_processing = std::time::Instant::now();
         let mut all_tokens = vec![];
         let mut next_token = {

@@ -1,5 +1,3 @@
-use crate::configs::ChatModelConfig;
-
 pub(crate) mod chat_format;
 mod model;
 mod utils;

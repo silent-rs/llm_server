@@ -117,7 +117,7 @@ pub struct CreateTranscriptionResponse {
 }
 
 impl CreateTranscriptionResponse {
-    pub fn new(segments: Vec<Segment>, format: ResponseFormat) -> Self {
+    pub(crate) fn new(segments: Vec<Segment>, format: ResponseFormat) -> Self {
         Self { segments, format }
     }
 }

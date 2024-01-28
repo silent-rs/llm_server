@@ -21,7 +21,7 @@ pub struct ChatCompletionRequest {
     #[builder(default, setter(strip_option))]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) max_tokens: Option<usize>,
-    /// How many chat completion choices to generate for each input message. Note that you will be charged based on the number of generated tokens across all of the choices. Keep n as 1 to minimize costs.
+    /// How many chat completion choices to generate for each input message. Note that you will be charged based on the number of generated tokens across all the choices. Keep n as 1 to minimize costs.
     #[builder(default, setter(strip_option))]
     #[serde(skip_serializing_if = "Option::is_none")]
     n: Option<usize>,
@@ -33,7 +33,7 @@ pub struct ChatCompletionRequest {
     #[builder(default, setter(strip_option))]
     #[serde(skip_serializing_if = "Option::is_none")]
     response_format: Option<ChatResponseFormatObject>,
-    /// This feature is in Beta. If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism is not guaranteed, and you should refer to the system_fingerprint response parameter to monitor changes in the backend.
+    /// This feature is in Beta. If specified, our system will make the best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism is not guaranteed, and you should refer to the system_fingerprint response parameter to monitor changes in the backend.
     #[builder(default, setter(strip_option))]
     #[serde(skip_serializing_if = "Option::is_none")]
     seed: Option<usize>,
@@ -58,7 +58,7 @@ pub struct ChatCompletionRequest {
     #[builder(default, setter(into))]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     tools: Option<Vec<Tool>>,
-    /// Controls which (if any) function is called by the model. none means the model will not call a function and instead generates a message. auto means the model can pick between generating a message or calling a function. Specifying a particular function via {"type: "function", "function": {"name": "my_function"}} forces the model to call that function. none is the default when no functions are present. auto is the default if functions are present.
+    /// Controls which (if any) function is called by the model. none means the model will not call a function and instead generates a message. auto means the model can pick between generating a message or calling a function. Specifying a particular function via {"type": "function", "function": {"name": "my_function"}} forces the model to call that function. none is the default when no functions are present. auto is the default if functions are present.
     #[builder(default, setter(strip_option))]
     #[serde(skip_serializing_if = "Option::is_none")]
     tool_choice: Option<ToolChoice>,
@@ -204,7 +204,7 @@ pub struct ChatCompletionResponse {
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ChatCompletionChoice {
-    /// The reason the model stopped generating tokens. This will be stop if the model hit a natural stop point or a provided stop sequence, length if the maximum number of tokens specified in the request was reached, content_filter if content was omitted due to a flag from our content filters, tool_calls if the model called a tool, or function_call (deprecated) if the model called a function.
+    /// The reason the model stopped generating tokens. This will be stopped if the model hit a natural stop point or a provided stop sequence, length if the maximum number of tokens specified in the request was reached, content_filter if content was omitted due to a flag from our content filters, tool_calls if the model called a tool, or function_call (deprecated) if the model called a function.
     pub finish_reason: FinishReason,
     /// The index of the choice in the list of choices.
     pub index: usize,
