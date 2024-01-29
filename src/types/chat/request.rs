@@ -35,7 +35,7 @@ pub struct ChatCompletionRequest {
     /// An object specifying the format that the model must output. Setting to { "type": "json_object" } enables JSON mode, which guarantees the message the model generates is valid JSON.
     #[builder(default, setter(strip_option))]
     #[serde(skip_serializing_if = "Option::is_none")]
-    response_format: Option<ChatResponseFormatObject>,
+    pub(crate) response_format: Option<ChatResponseFormatObject>,
     /// This feature is in Beta. If specified, our system will make the best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism is not guaranteed, and you should refer to the system_fingerprint response parameter to monitor changes in the backend.
     #[builder(default, setter(strip_option))]
     #[serde(skip_serializing_if = "Option::is_none")]

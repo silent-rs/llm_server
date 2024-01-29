@@ -12,9 +12,9 @@ tokenizer = "/Users/hubertshelley/Documents/machine_learn/Yi-6B-Chat/tokenizer.j
 # 聊天模型配置列表
 
 # 语音转文字模型配置列表
-#whisper_configs = []
-[[whisper_configs]]
-model_id = "/Users/hubertshelley/Documents/machine_learn/whisper-large-v3"
-alias = "large-v3"
-cpu = false
+whisper_configs = []
+#[[whisper_configs]]
+#model_id = "/Users/hubertshelley/Documents/machine_learn/whisper-large-v3"
+#alias = "large-v3"
+#cpu = false
 

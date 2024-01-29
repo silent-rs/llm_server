@@ -1689,6 +1689,7 @@ dependencies = [
  "chrono",
  "clap",
  "derive_builder 0.13.0",
+ "futures-util",
  "llama_cpp_rs",
  "rand 0.8.5",
  "serde",

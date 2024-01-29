@@ -1,7 +1,6 @@
 use derive_builder::Builder;
 use serde::{Deserialize, Serialize};
 
-
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "snake_case", tag = "role")]
 pub enum ChatCompletionMessage {
@@ -79,7 +78,7 @@ pub enum ToolType {
 }
 #[derive(Debug, Clone, Deserialize)]
 pub struct ChatResponseFormatObject {
-    r#type: ChatResponseFormat,
+    pub(crate) r#type: ChatResponseFormat,
 }
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Deserialize)]
@@ -147,4 +146,5 @@ pub enum FinishReason {
     Length,
     ContentFilter,
     ToolCalls,
+    Null,
 }
