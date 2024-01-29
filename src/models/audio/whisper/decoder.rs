@@ -1,5 +1,5 @@
-use crate::models::audio::whisper::device::token_id;
 use crate::models::audio::whisper::model::Model;
+use crate::models::device::token_id;
 use anyhow::Error as E;
 use candle_core::{self as candle, Device, IndexOp, Tensor};
 use candle_nn::ops::softmax;
@@ -135,8 +135,8 @@ impl Decoder {
         for i in 0..sample_len {
             let tokens_t = Tensor::new(tokens.as_slice(), mel.device())?;
 
-            // The model expects a batch dim but this inference loop does not handle
-            // it so we add it at this point.
+            // The model expects a batch dim but this inference loop does not handle it,
+            // so we add it at this point.
             let tokens_t = tokens_t.unsqueeze(0)?;
             let ys = model.decoder_forward(&tokens_t, &audio_features, i == 0)?;
 

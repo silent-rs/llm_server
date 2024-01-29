@@ -1,11 +1,12 @@
+use crate::models::chat::chat_format::ChatFormat;
 use serde::Deserialize;
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct Config {
     pub host: Option<String>,
     pub port: Option<u16>,
-    pub(crate) chat_configs: Vec<ChatModelConfig>,
-    pub(crate) whisper_configs: Vec<WhisperModelConfig>,
+    pub(crate) chat_configs: Option<Vec<ChatModelConfig>>,
+    pub(crate) whisper_configs: Option<Vec<WhisperModelConfig>>,
 }
 
 impl Config {
@@ -20,19 +21,14 @@ impl Config {
 pub(crate) struct ChatModelConfig {
     pub(crate) model_id: String,
     pub(crate) alias: String,
-    pub(crate) context_size: Option<i32>,
-    pub(crate) seed: Option<i32>,
-    pub(crate) n_batch: Option<i32>,
-    pub(crate) f16_memory: Option<bool>,
-    pub(crate) m_lock: Option<bool>,
-    pub(crate) m_map: Option<bool>,
-    pub(crate) low_vram: Option<bool>,
-    pub(crate) vocab_only: Option<bool>,
-    pub(crate) embeddings: Option<bool>,
-    pub(crate) n_gpu_layers: Option<i32>,
-    pub(crate) main_gpu: Option<String>,
-    pub(crate) tensor_split: Option<String>,
-    pub(crate) numa: Option<bool>,
+    pub(crate) tokenizer: Option<String>,
+    #[serde(default = "default_cpu")]
+    pub(crate) cpu: bool,
+    #[serde(default = "default_seed")]
+    pub(crate) seed: u64,
+    pub(crate) gqa: usize,
+    #[serde(default = "default_chat_format")]
+    pub(crate) chat_format: ChatFormat,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -47,6 +43,9 @@ pub(crate) struct WhisperModelConfig {
     pub(crate) quantized: bool,
 }
 
+fn default_chat_format() -> ChatFormat {
+    ChatFormat::ChatML
+}
 fn default_cpu() -> bool {
     true
 }
@@ -64,6 +63,11 @@ mod tests {
     #[test]
     fn test_config() {
         let config = super::Config::load("test_config.toml".to_string()).unwrap();
+        println!("{:?}", config);
+    }
+    #[test]
+    fn test_chat_config() {
+        let config = super::Config::load("test_chat_config.toml".to_string()).unwrap();
         println!("{:?}", config);
     }
 }

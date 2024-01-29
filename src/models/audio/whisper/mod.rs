@@ -1,13 +1,12 @@
 pub(crate) mod decoder;
-mod device;
 pub(crate) mod model;
 mod multilingual;
 mod pcm_decode;
 
 use crate::configs::WhisperModelConfig;
 use crate::models::audio::whisper::decoder::{Decoder, Task};
-use crate::models::audio::whisper::device::{device, token_id};
 use crate::models::audio::whisper::pcm_decode::pcm_decode;
+use crate::models::device::{device, token_id};
 use crate::types::audio::transcription::{CreateTranscriptionRequest, CreateTranscriptionResponse};
 use anyhow::{Error as E, Result};
 use candle_core as candle;
@@ -37,7 +36,7 @@ impl Whisper {
     ) -> Result<CreateTranscriptionResponse> {
         let input = request.file.path().clone();
 
-        let pcm_data = pcm_decode(input);
+        let pcm_data = pcm_decode(input)?;
         let config = self.config.clone();
         let mel_filters = self.mel_filters.clone();
         let mel = audio::pcm_to_mel(&config, &pcm_data, &mel_filters);

@@ -1,3 +1,4 @@
+use anyhow::{anyhow, Result};
 use std::path::PathBuf;
 use symphonia::core::audio::{AudioBufferRef, Signal};
 use symphonia::core::codecs::{DecoderOptions, CODEC_TYPE_NULL};
@@ -6,9 +7,9 @@ use symphonia::core::io::MediaSourceStream;
 use symphonia::core::meta::MetadataOptions;
 use symphonia::core::probe::Hint;
 
-pub(crate) fn pcm_decode(path: PathBuf) -> Vec<f32> {
+pub(crate) fn pcm_decode(path: PathBuf) -> Result<Vec<f32>> {
     // Open the media source.
-    let src = std::fs::File::open(path).expect("failed to open media");
+    let src = std::fs::File::open(path).map_err(|e| anyhow!("failed to open media:{e}"))?;
 
     // Create the media source stream.
     let mss = MediaSourceStream::new(Box::new(src), Default::default());
@@ -23,7 +24,7 @@ pub(crate) fn pcm_decode(path: PathBuf) -> Vec<f32> {
     // Probe the media source.
     let probed = symphonia::default::get_probe()
         .format(&hint, mss, &fmt_opts, &meta_opts)
-        .expect("unsupported format");
+        .map_err(|e| anyhow!("unsupported format: {e}"))?;
     // Get the instantiated format reader.
     let mut format = probed.format;
 
@@ -32,15 +33,13 @@ pub(crate) fn pcm_decode(path: PathBuf) -> Vec<f32> {
         .tracks()
         .iter()
         .find(|t| t.codec_params.codec != CODEC_TYPE_NULL)
-        .expect("no supported audio tracks");
+        .ok_or_else(|| anyhow!("no supported audio tracks"))?;
 
     // Use the default options for the decoder.
     let dec_opts: DecoderOptions = Default::default();
 
     // Create a decoder for the track.
-    let mut decoder = symphonia::default::get_codecs()
-        .make(&track.codec_params, &dec_opts)
-        .expect("unsupported codec");
+    let mut decoder = symphonia::default::get_codecs().make(&track.codec_params, &dec_opts)?;
     let track_id = track.id;
     let mut input = Vec::new();
     // The decode loop.
@@ -101,5 +100,5 @@ pub(crate) fn pcm_decode(path: PathBuf) -> Vec<f32> {
             _ => {}
         }
     }
-    input
+    Ok(input)
 }

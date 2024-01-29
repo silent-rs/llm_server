@@ -1,20 +1,14 @@
 host = "0.0.0.0"
-port = 8000
+port = 8080
 
-#chat_configs = []
+# 聊天模型配置列表
 [[chat_configs]]
 model_id = "/Users/hubertshelley/Documents/machine_learn/yi-chat-6B-GGUF/yi-chat-6b.Q5_K_M.gguf"
 alias = "yi-chat-6b.Q5_K_M.gguf"
-# 目前candle尚不支持gpu
-cpu = false
+cpu = true
 gqa = 1
 tokenizer = "/Users/hubertshelley/Documents/machine_learn/Yi-6B-Chat/tokenizer.json"
-# 聊天模型配置列表
 
 # 语音转文字模型配置列表
 whisper_configs = []
-#[[whisper_configs]]
-#model_id = "/Users/hubertshelley/Documents/machine_learn/whisper-large-v3"
-#alias = "large-v3"
-#cpu = false
 
