@@ -15,14 +15,42 @@ pub struct Models {
 impl Models {
     pub fn new(config: Config) -> anyhow::Result<Self> {
         let mut model_map = HashMap::new();
-        for chat_config in config.chat_configs.unwrap_or_default() {
+        for (index, chat_config) in config
+            .chat_configs
+            .unwrap_or_default()
+            .into_iter()
+            .enumerate()
+        {
+            let start = std::time::Instant::now();
+            println!("{}: init chat model: {}", index + 1, chat_config.alias);
             let alias = chat_config.alias.clone();
-            let model = chat::init_model(chat_config)?;
+            let model = chat::init_model(chat_config.clone())?;
+            println!(
+                "init chat model: {} finished in {:2}s",
+                chat_config.alias,
+                start.elapsed().as_secs()
+            );
             model_map.insert(alias, Model::Chat(model));
         }
-        for whisper_config in config.whisper_configs.unwrap_or_default() {
+        for (index, whisper_config) in config
+            .whisper_configs
+            .unwrap_or_default()
+            .into_iter()
+            .enumerate()
+        {
+            let start = std::time::Instant::now();
+            println!(
+                "{}: init whisper model: {}",
+                index + 1,
+                whisper_config.alias
+            );
             let alias = whisper_config.alias.clone();
-            let model = audio::whisper::init_model(whisper_config)?;
+            let model = audio::whisper::init_model(whisper_config.clone())?;
+            println!(
+                "init whisper model: {} finished in {:2}s",
+                whisper_config.alias,
+                start.elapsed().as_secs()
+            );
             model_map.insert(alias, Model::Whisper(model));
         }
         Ok(Self { model_map })

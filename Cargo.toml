@@ -46,3 +46,4 @@ llama_cpp_rs = "0.3.0"
 derive_builder = "0.13.0"
 uuid = { version = "1.7.0", features = ["v4"] }
 futures-util = "0.3.30"
+regex = "1.10.3"

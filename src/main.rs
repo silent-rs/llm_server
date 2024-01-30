@@ -10,11 +10,13 @@ async fn main() {
     let args = Args::parse();
     let mut configs = Configs::default();
     let llm_config = LlmConfig::load(args.configs).expect("failed to load config");
-    let host = llm_config
-        .host
-        .clone()
-        .unwrap_or(args.host.clone().unwrap_or_else(|| "localhost".to_string()));
-    let port = llm_config.port.unwrap_or(args.port.unwrap_or(8000));
+    let host = args.host.unwrap_or(
+        llm_config
+            .host
+            .clone()
+            .unwrap_or_else(|| "localhost".to_string()),
+    );
+    let port = args.port.unwrap_or(llm_config.port.unwrap_or(8000));
     let models = Models::new(llm_config).expect("failed to initialize models");
     configs.insert(models);
     let route = Route::new("").append(get_routes()).hook(

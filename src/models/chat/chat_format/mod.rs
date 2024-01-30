@@ -81,8 +81,8 @@ impl ChatFormat {
         match self {
             Self::Llama2 => "</s>".to_string(),
             Self::Alpaca => "</s>".to_string(),
-            // Self::ChatML => "<|im_end|>".to_string(),
-            Self::ChatML => "<".to_string(),
+            Self::ChatML => "<|im_end|>".to_string(),
+            // Self::ChatML => "<".to_string(),
             Self::ChatGLM3 => "</s>".to_string(),
             Self::OpenChat => "<|end_of_turn|>".to_string(),
         }
