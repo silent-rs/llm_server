@@ -6,6 +6,8 @@ use candle_nn::ops::softmax;
 use candle_transformers::models::whisper as m;
 use rand::distributions::Distribution;
 use rand::SeedableRng;
+use regex::Regex;
+use std::time::Duration;
 use tokenizers::Tokenizer;
 
 pub(crate) enum Task {
@@ -30,9 +32,82 @@ pub struct Segment {
     dr: DecodingResult,
 }
 
+#[derive(Debug, Clone)]
+struct TimestampText {
+    start: f64,
+    end: f64,
+    text: String,
+    index: usize,
+}
+
+impl TimestampText {
+    fn get_start_str(&self) -> String {
+        let duration = Duration::from_secs_f64(self.start);
+        format!(
+            "{:02}:{:02}:{:02},{:03}",
+            duration.as_secs() / 3600,
+            duration.as_secs() / 60 % 60,
+            duration.as_secs() % 60,
+            duration.subsec_millis(),
+        )
+    }
+    fn get_end_str(&self) -> String {
+        let duration = Duration::from_secs_f64(self.end);
+        format!(
+            "{:02}:{:02}:{:02},{:03}",
+            duration.as_secs() / 3600,
+            duration.as_secs() / 60 % 60,
+            duration.as_secs() % 60,
+            duration.subsec_millis(),
+        )
+    }
+    fn srt(&self) -> String {
+        format!(
+            "{index}\n{start} --> {end}\n{text}\n",
+            index = self.index + 1,
+            start = self.get_start_str(),
+            end = self.get_end_str(),
+            text = self.text,
+        )
+    }
+
+    fn vtt(&self) -> String {
+        format!(
+            "{start} --> {end}\n{text}\n",
+            start = self.get_start_str(),
+            end = self.get_end_str(),
+            text = self.text,
+        )
+    }
+}
+
 impl Segment {
     pub(crate) fn text(&self) -> String {
         self.dr.text.clone()
+    }
+    fn get_timestamp_text(&self, index: usize) -> TimestampText {
+        let text = self.text();
+        let pattern = Regex::new(r"<\|(\d+\.\d+)\|>").unwrap();
+        let a: Vec<f64> = pattern
+            .captures_iter(&text)
+            .take(2)
+            .filter_map(|capture| capture.get(1))
+            .map(|matched| matched.as_str().parse::<f64>().unwrap())
+            .collect();
+        let start = a[0];
+        let end = a[1];
+        TimestampText {
+            start,
+            end,
+            index,
+            text: pattern.replace_all(&text, "").to_string(),
+        }
+    }
+    pub(crate) fn srt(&self, index: usize) -> String {
+        self.get_timestamp_text(index).srt()
+    }
+    pub(crate) fn vtt(&self, index: usize) -> String {
+        self.get_timestamp_text(index).vtt()
     }
 }
 
@@ -295,5 +370,29 @@ impl Decoder {
             segments.push(segment)
         }
         Ok(segments)
+    }
+}
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_timestamp_text_srt() {
+        let tts = super::TimestampText {
+            start: 0.0,
+            end: 1.0,
+            index: 0,
+            text: "hello world".to_string(),
+        };
+        assert_eq!(tts.srt(), "1\n00:00:00,000 --> 00:00:01,000\nhello world\n");
+    }
+
+    #[test]
+    fn test_timestamp_text_vtt() {
+        let tts = super::TimestampText {
+            start: 0.0,
+            end: 1.0,
+            index: 0,
+            text: "hello world".to_string(),
+        };
+        assert_eq!(tts.vtt(), "00:00:00,000 --> 00:00:01,000\nhello world\n");
     }
 }

@@ -136,12 +136,29 @@ impl From<CreateTranscriptionResponse> for Response {
                 .collect::<Vec<_>>()
                 .join("")
                 .into(),
-            ResponseFormat::Srt => !unimplemented!("Srt"),
+            ResponseFormat::Srt => value
+                .segments
+                .iter()
+                .enumerate()
+                .map(|(i, s)| s.srt(i))
+                .collect::<Vec<_>>()
+                .join("\n")
+                .into(),
+            ResponseFormat::Vtt => format!(
+                "WEBVTT\n\n\n{}",
+                value
+                    .segments
+                    .iter()
+                    .enumerate()
+                    .map(|(i, s)| s.vtt(i))
+                    .collect::<Vec<_>>()
+                    .join("\n")
+            )
+            .into(),
             ResponseFormat::VerboseJson => json!({
                 "text": value.segments.iter().map(|s| s.text()).collect::<Vec<_>>().join(""),
             })
             .into(),
-            ResponseFormat::Vtt => !unimplemented!("Vtt"),
         }
     }
 }

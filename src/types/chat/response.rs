@@ -76,22 +76,3 @@ impl ChatCompletionResponseChunk {
         }
     }
 }
-
-#[derive(Debug, Clone)]
-pub(crate) enum ChatResponse {
-    Chunk(ChatCompletionResponseChunk),
-    Completion(ChatCompletionResponse),
-    Text(String),
-}
-
-impl From<ChatCompletionResponse> for ChatResponse {
-    fn from(value: ChatCompletionResponse) -> Self {
-        Self::Completion(value)
-    }
-}
-
-impl From<ChatCompletionResponseChunk> for ChatResponse {
-    fn from(value: ChatCompletionResponseChunk) -> Self {
-        Self::Chunk(value)
-    }
-}

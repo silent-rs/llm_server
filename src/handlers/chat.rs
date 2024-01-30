@@ -1,7 +1,4 @@
-use crate::types::chat::completion::{
-    ChatCompletionChoice, ChatResponseFormat, ChatResponseFormatObject,
-};
-use crate::types::chat::response::ChatResponse;
+use crate::types::chat::completion::ChatResponseFormat;
 use crate::types::chat::ChatCompletionRequest;
 use crate::Models;
 use silent::prelude::sse_reply;
