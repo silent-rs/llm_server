@@ -43,7 +43,7 @@ symphonia = { version = "0.5.3", features = ["all"] }
 
 # chat
 llama_cpp_rs = "0.3.0"
-derive_builder = "0.13.0"
+derive_builder = "0.20.0"
 uuid = { version = "1.7.0", features = ["v4"] }
 futures-util = "0.3.30"
 regex = "1.10.3"
